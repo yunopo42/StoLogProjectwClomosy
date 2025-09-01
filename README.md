@@ -23,5 +23,12 @@ This project was developed as part of my **internship experience**, where I aime
 StoLog not only gave me hands-on practice with Clomosy/TRObject development, but also taught me how to **identify real-world problems and design practical solutions**. 🚀
 
 ---
+#Images from the App
+![StokTakip](https://github.com/user-attachments/assets/298be903-ced7-486d-9970-b5d6ae98b7f0)
+![registerpanel](https://github.com/user-attachments/assets/53f6cee8-60a6-435c-b98c-65ca0bba1c88)
+![LoginPage](https://github.com/user-attachments/assets/7cdb4d8f-ac2b-40ad-9001-92c06a54ec56)
+![HistoryGecmisAnaliz](https://github.com/user-attachments/assets/e80f17a0-5403-420a-a932-0cdd891c326a)
+![FleetSevkiyat](https://github.com/user-attachments/assets/9a8af8fc-9687-454f-af54-351f98be8b29)
+![DahboardAnasayfa](https://github.com/user-attachments/assets/20425c3a-41f4-4391-b36c-4cd8e0385ea3)
 
 #Clomosy #TRObject #SQLite #Logistics #InventoryManagement #ERP #SoftwareDevelopment #Internship
