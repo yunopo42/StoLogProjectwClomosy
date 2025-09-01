@@ -1,0 +1,238 @@
+// Sign Up - Register Sayfası
+var
+  myRegisterForm : TclForm;
+  registerPanel  : TclProPanel;
+  titleLabel     : TClProLabel;
+  userEdit, passEdit, passRepeatEdit : TclProEdit;
+  registerBtn    : TClProButton;
+  backToLoginBtn : TClProButton;
+  userPng        : TClProImage;
+  pswrdPng       : TClProImage;
+  pswrdRepeatPng : TClProImage; 
+  
+  
+  togglePass1Img : TClProImage;
+  togglePass2Img : TClProImage;
+
+  DBPath, DBPassword : String;
+  Qry : TClSQLiteQuery;
+  cnt : Integer;
+
+
+void BackToLogin;
+{
+  myRegisterForm.clHide;
+}
+
+
+// Kayıt İşlemi
+void RegisterUser;
+{
+  if (userEdit.Text == '') { ShowMessage('Hata: Kullanıcı adı boş bırakılamaz!'); Exit; }
+  if (passEdit.Text == '') { ShowMessage('Hata: Şifre boş bırakılamaz!'); Exit; }
+  if (passEdit.Text <> passRepeatEdit.Text) { ShowMessage('Hata: Şifreler birbiriyle eşleşmiyor!'); Exit; }
+
+  DBPassword = '';
+  if (Clomosy.PlatformIsMobile)
+    DBPath = Clomosy.AppFilesPath + 'new.db3';
+  else
+    DBPath = 'C:/StoLogProject/database/new.db3';
+
+  try
+    Clomosy.DBSQLiteConnect(DBPath, DBPassword);
+    Clomosy.DBSQLiteQuery.Sql.Text =
+      'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL UNIQUE, pswrd TEXT NOT NULL)';
+    Clomosy.DBSQLiteQuery.OpenOrExecute;
+
+    Qry = Clomosy.DBSQLiteQueryWith('SELECT COUNT(*) AS cnt FROM users WHERE username = ' + QuotedStr(userEdit.Text));
+    Qry.OpenOrExecute;
+
+    cnt = Qry.FieldByName('cnt').AsInteger;
+    if (cnt > 0) { ShowMessage('Hata: Bu kullanıcı adı zaten alınmış!'); Exit; }
+
+    Clomosy.DBSQLiteQuery.Sql.Text =
+      'INSERT INTO users (username, pswrd) VALUES (' + QuotedStr(userEdit.Text) + ', ' + QuotedStr(passEdit.Text) + ')';
+    Clomosy.DBSQLiteQuery.OpenOrExecute;
+
+    ShowMessage('Kayıt başarılı! Giriş ekranına dönülüyor...');
+    BackToLogin;
+  except
+    ShowMessage('Hata: ' + LastExceptionClassName + ' - ' + LastExceptionMessage);
+  }
+}
+// şifre görünürlüğü
+void TogglePass1Visibility;
+{
+  if (passEdit.Password == True)
+  {
+    passEdit.Password = False;
+    togglePass1Img.clProSettings.PictureSource = 'https://cdn-icons-png.flaticon.com/512/159/159604.png';
+  }
+  else
+  {
+    passEdit.Password = True;
+    togglePass1Img.clProSettings.PictureSource = 'https://cdn-icons-png.flaticon.com/512/159/159604.png';
+  }
+  passEdit.SetclProSettings(passEdit.clProSettings);
+  togglePass1Img.SetclProSettings(togglePass1Img.clProSettings);
+}
+
+void TogglePass2Visibility;
+{
+  if (passRepeatEdit.Password == True)
+  {
+    passRepeatEdit.Password = False;
+    togglePass2Img.clProSettings.PictureSource = 'https://cdn-icons-png.flaticon.com/512/159/159604.png';
+  }
+  else
+  {
+    passRepeatEdit.Password = True;
+    togglePass2Img.clProSettings.PictureSource = 'https://cdn-icons-png.flaticon.com/512/159/159604.png';
+  }
+  passRepeatEdit.SetclProSettings(passRepeatEdit.clProSettings);
+  togglePass2Img.SetclProSettings(togglePass2Img.clProSettings);
+}
+
+
+void CreateRegisterForm;
+{
+  
+  registerPanel = myRegisterForm.AddNewProPanel(myRegisterForm, 'registerPanel');
+  registerPanel.Width  = 350; 
+  registerPanel.Height = 400; 
+  registerPanel.Align  = alCenter;
+  registerPanel.clProSettings.RoundWidth   = 20;
+  registerPanel.clProSettings.RoundHeight  = 20;
+  registerPanel.clProSettings.BorderWidth  = 1; 
+  registerPanel.clProSettings.BorderColor  = clAlphaColor.clHexToColor('#E0E0E0'); 
+  registerPanel.clProSettings.BackgroundColor = clAlphaColor.clHexToColor('#ffffff');
+  registerPanel.SetclProSettings(registerPanel.clProSettings);
+  
+  titleLabel = myRegisterForm.AddNewProLabel(registerPanel, 'titleLabel', 'Yeni Hesap Oluştur');
+  titleLabel.Height = 35;
+  titleLabel.Align = alTop;
+  titleLabel.Margins.Top = 25;
+  titleLabel.Margins.Bottom = 20;
+  titleLabel.clProSettings.FontSize = 24;
+  titleLabel.clProSettings.FontHorzAlign = palcenter;
+  titleLabel.SetclProSettings(titleLabel.clProSettings);
+  
+  userEdit = myRegisterForm.AddNewProEdit(registerPanel, 'userEdit', 'Yeni Kullanıcı Adınız');
+  userEdit.Align = alTop;
+  userEdit.Margins.Top = 15;
+  userEdit.Height = 45;
+  userEdit.Margins.Left  = 35;
+  userEdit.Margins.Right = 35;
+  userEdit.clProSettings.BorderColor = clAlphaColor.clHexToColor('#007BFF'); 
+  userEdit.clProSettings.BorderWidth = 2;
+  userEdit.clProSettings.RoundWidth  = 12;
+  userEdit.clProSettings.RoundHeight = 12;
+  userEdit.SetclProSettings(userEdit.clProSettings);
+
+  userPng = myRegisterForm.AddNewProImage(userEdit, 'userPng');
+  userPng.Align = alLeft;
+  userPng.Margins.Left = 8;
+  userPng.Height = 26;
+  userPng.Width  = 26;
+  userPng.clProSettings.PictureSource = 'https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png';
+  userPng.SetclProSettings(userPng.clProSettings);
+
+  passEdit = myRegisterForm.AddNewProEdit(registerPanel, 'passEdit', 'Yeni Şifreniz');
+  passEdit.Align = alTop;
+  passEdit.Margins.Top = 15;
+  passEdit.Height = 45;
+  passEdit.Margins.Left  = 35;
+  passEdit.Margins.Right = 35;
+  passEdit.clProSettings.BorderColor = clAlphaColor.clHexToColor('#007BFF');
+  passEdit.clProSettings.BorderWidth = 2;
+  passEdit.clProSettings.RoundWidth  = 12;
+  passEdit.clProSettings.RoundHeight = 12;
+  passEdit.Password = True; 
+  passEdit.SetclProSettings(passEdit.clProSettings);
+
+  pswrdPng = myRegisterForm.AddNewProImage(passEdit, 'pswrdPng');
+  pswrdPng.Align = alLeft;
+  pswrdPng.Margins.Left = 8;
+  pswrdPng.Height = 26;
+  pswrdPng.Width  = 26;
+  pswrdPng.clProSettings.PictureSource = 'https://cdn-icons-png.flaticon.com/512/7817/7817004.png'; 
+  pswrdPng.SetclProSettings(pswrdPng.clProSettings);
+  
+  togglePass1Img = myRegisterForm.AddNewProImage(passEdit, 'togglePass1Img');
+  togglePass1Img.Align = alRight;
+  togglePass1Img.Width = 26; togglePass1Img.Height = 26;
+  togglePass1Img.Margins.Right = 8;
+  togglePass1Img.clProSettings.PictureSource = 'https://cdn-icons-png.flaticon.com/512/159/159604.png'; 
+  togglePass1Img.SetclProSettings(togglePass1Img.clProSettings);
+
+  passRepeatEdit = myRegisterForm.AddNewProEdit(registerPanel, 'passRepeatEdit', 'Şifrenizi Tekrarlayın');
+  passRepeatEdit.Align = alTop;
+  passRepeatEdit.Margins.Top = 15;
+  passRepeatEdit.Height = 45;
+  passRepeatEdit.Margins.Left  = 35;
+  passRepeatEdit.Margins.Right = 35;
+  passRepeatEdit.clProSettings.BorderColor = clAlphaColor.clHexToColor('#007BFF');
+  passRepeatEdit.clProSettings.BorderWidth = 2;
+  passRepeatEdit.clProSettings.RoundWidth  = 12;
+  passRepeatEdit.clProSettings.RoundHeight = 12;
+  passRepeatEdit.Password = True; 
+  passRepeatEdit.SetclProSettings(passRepeatEdit.clProSettings);
+  
+  pswrdRepeatPng = myRegisterForm.AddNewProImage(passRepeatEdit, 'pswrdRepeatPng');
+  pswrdRepeatPng.Align = alLeft;
+  pswrdRepeatPng.Margins.Left = 8;
+  pswrdRepeatPng.Height = 26;
+  pswrdRepeatPng.Width  = 26;
+  pswrdRepeatPng.clProSettings.PictureSource = 'https://cdn-icons-png.flaticon.com/512/7817/7817004.png'; 
+  pswrdRepeatPng.SetclProSettings(pswrdRepeatPng.clProSettings);
+  
+  togglePass2Img = myRegisterForm.AddNewProImage(passRepeatEdit, 'togglePass2Img');
+  togglePass2Img.Align = alRight;
+  togglePass2Img.Width = 26; togglePass2Img.Height = 26;
+  togglePass2Img.Margins.Right = 8;
+  togglePass2Img.clProSettings.PictureSource = 'https://cdn-icons-png.flaticon.com/512/159/159604.png'; 
+  togglePass2Img.SetclProSettings(togglePass2Img.clProSettings);
+
+  registerBtn = myRegisterForm.AddNewProButton(registerPanel, 'registerBtn', 'Hesap Oluştur');
+  registerBtn.Align = alTop;
+  registerBtn.Height = 45;
+  registerBtn.Margins.Left  = 35;
+  registerBtn.Margins.Right = 35;
+  registerBtn.Margins.Top   = 25;
+  registerBtn.clProSettings.BackGroundColor = clAlphaColor.clHexToColor('#007BFF'); 
+  registerBtn.clProSettings.RoundHeight = 12;
+  registerBtn.clProSettings.RoundWidth  = 12;
+  registerBtn.clProSettings.FontColor   = clAlphaColor.clHexToColor('#ffffff');
+  registerBtn.clProSettings.FontSize    = 16;
+  registerBtn.SetclProSettings(registerBtn.clProSettings);
+
+  backToLoginBtn = myRegisterForm.AddNewProButton(registerPanel, 'backToLoginBtn', 'Zaten bir hesabım var');
+  backToLoginBtn.Align = alTop;
+  backToLoginBtn.Height = 40;
+  backToLoginBtn.Margins.Left  = 35;
+  backToLoginBtn.Margins.Right = 35;
+  backToLoginBtn.Margins.Top   = 15;
+  backToLoginBtn.clProSettings.FontSize = 14;
+  backToLoginBtn.clProSettings.BackGroundColor = clAlphaColor.clHexToColor('#00000000'); 
+  backToLoginBtn.clProSettings.FontColor = clAlphaColor.clHexToColor('#007BFF'); 
+  backToLoginBtn.clProSettings.BorderColor = clAlphaColor.clHexToColor('#007BFF');
+  backToLoginBtn.clProSettings.BorderWidth = 2;
+  backToLoginBtn.clProSettings.RoundHeight = 12;
+  backToLoginBtn.clProSettings.RoundWidth  = 12;
+  backToLoginBtn.SetclProSettings(backToLoginBtn.clProSettings);
+}
+
+{
+  myRegisterForm = TclForm.Create(Self);
+  myRegisterForm.clSetWindowState(fwsMaximized);
+  myRegisterForm.SetFormBGImage('https://www.etasimacilik.com/images/photos/landing-image-1.jpg');
+
+  CreateRegisterForm;
+
+  myRegisterForm.AddNewEvent(registerBtn,    tbeOnClick, 'RegisterUser');
+  myRegisterForm.AddNewEvent(backToLoginBtn, tbeOnClick, 'BackToLogin');
+  myRegisterForm.AddNewEvent(togglePass1Img, tbeOnClick, 'TogglePass1Visibility');
+  myRegisterForm.AddNewEvent(togglePass2Img, tbeOnClick, 'TogglePass2Visibility');
+
+  myRegisterForm.Run;
+}
